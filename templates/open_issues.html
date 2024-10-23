@@ -1,0 +1,201 @@
+{% extends 'sidebar.html' %}
+
+{% block content %}
+    <style>
+        /* Issue card styling */
+        .issue-card {
+            border-left: 4px solid #007bff;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .issue-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* For smaller, two-column layout */
+        .issues-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        /* Styling for issue state */
+        .issue-state {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .issue-state.open {
+            color: #28a745;
+        }
+
+        .issue-state.closed {
+            color: #dc3545;
+        }
+
+        .issue-state i {
+            margin-right: 8px;
+        }
+
+        .issue-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .issue-details p {
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+
+        .btn-close {
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            background-color: #dc3545;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-close:hover {
+            background-color: #c82333;
+        }
+
+        .header {
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .form-inline {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .form-select-lg {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+        }
+
+        .btn-primary {
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-primary:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+
+    <div class="container-fluid d-flex flex-column align-items-center p-0">
+        <div class="form-container">
+            <!-- Form for selecting a repository -->
+            <form method="POST" class="form-inline">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="repoSelect" class="form-label font-weight-bold">Choose a Repository:</label>
+                    <select name="repo" id="repoSelect" class="form-select form-select-lg" required>
+                        <option value="">Select a repository</option>
+                        {% for repo in repository_list %}
+                            <option value="{{ repo.id }}">{{ repo.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3" id="submitButton" disabled>Get Issues</button>
+            </form>
+        </div>
+        <!-- Issues Section -->
+        <div class="main-content flex-grow-1 p-4 w-100">
+            <header class="header d-flex justify-content-between align-items-center">
+                <h2 class="h4">GitHub Open Issues</h2>
+            </header>
+
+            {% if issues %}
+                <h5 class="mt-4">Issues for selected repository</h5>
+                <div class="issues-container">
+                    {% for issue in issues %}
+                        <div class="issue-card">
+                            <div class="issue-details">
+                                <h5 class="issue-title">{{ issue.title }}</h5>
+                                <p>{{ issue.description|default:"No description available" }}</p>
+                                <p class="issue-state {{ issue.state }}">
+                                    <i class="fas fa-check-circle"></i>
+                                    State: {{ issue.state|title }}
+                                </p>
+                                <p><strong>Comments:</strong> {{ issue.comments_count }}</p>
+                                {% if issue.assigned_to %}
+                                    <p><strong>Assigned to:</strong> {{ issue.assigned_to }}</p>
+                                {% endif %}
+                                {% if issue.created_by %}
+                                    <p><strong>Created by:</strong> {{ issue.created_by }}</p>
+                                {% endif %}
+                                <p><strong>Created at:</strong> {{ issue.created_at }}</p>
+                            </div>
+                            <div class="close-btn-container">
+                                <form method="POST" action="{% url 'close_issue' issue.issue_id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-close">Close Issue</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {% if request.method == 'POST' %}
+                    <p>No issues found or repository is private.</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- FontAwesome for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const repoSelect = document.getElementById('repoSelect');
+            const submitButton = document.getElementById('submitButton');
+
+            repoSelect.addEventListener('change', function () {
+                if (repoSelect.value !== "") {
+                    submitButton.disabled = false;
+                } else {
+                    submitButton.disabled = true;
+                }
+            });
+        });
+    </script>
+{% endblock %}

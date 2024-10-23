@@ -1,0 +1,144 @@
+{% extends 'sidebar.html' %}
+
+{% block content %}
+    {% if not request.session.github_username %}
+        <script>
+            window.location.href = "{% url 'login' %}";
+        </script>
+    {% endif %}
+
+    <div class="container-fluid d-flex p-0">
+        <!-- Main Dashboard Area -->
+        <div class="main-content flex-grow-1 p-5" style="background-color: #f4f7fc;">
+            <!-- Header -->
+            <header class="header d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h3 text-dark font-weight-bold">Issue Tracker Dashboard</h2>
+                <span class="text-muted">Logged in as: <strong>{{ request.session.github_username }}</strong></span>
+            </header>
+
+            <!-- GitHub API Rate Limit Section -->
+            <section class="rate-limit p-4 bg-gradient-primary text-white rounded shadow mb-5"
+                     style="background: linear-gradient(135deg, #4e73df 0%, #1cc88a 100%);">
+                <h3 class="h5 mb-3"><i class="fas fa-server"></i> GitHub API Rate Limit</h3>
+                <p class="mb-2"><strong>Remaining Requests:</strong> {{ rate_limit.remaining }}</p>
+                <p class="mb-2"><strong>Limit:</strong> {{ rate_limit.limit }}</p>
+                <p><strong>Resets At:</strong> {{ rate_limit.reset_time }}</p>
+            </section>
+
+            <!-- Stats Section -->
+            <section class="stats row mb-5">
+                <!-- Carduri pentru statistici -->
+                <div class="col-lg-3 col-md-6 stat-box text-center p-4 bg-white rounded shadow-sm mb-4"
+                     style="border-left: 5px solid #4e73df;">
+                    <h4 class="h6 text-uppercase text-muted">Total Issues</h4>
+                    <p class="stat-number display-4 font-weight-bold text-dark">{{ total_issues }}</p>
+                </div>
+                <div class="col-lg-3 col-md-6 stat-box text-center p-4 bg-white rounded shadow-sm mb-4"
+                     style="border-left: 5px solid #f6c23e;">
+                    <h4 class="h6 text-uppercase text-muted">Open Issues</h4>
+                    <p class="stat-number display-4 font-weight-bold text-warning">{{ open_issues }}</p>
+                </div>
+                <div class="col-lg-3 col-md-6 stat-box text-center p-4 bg-white rounded shadow-sm mb-4"
+                     style="border-left: 5px solid #1cc88a;">
+                    <h4 class="h6 text-uppercase text-muted">Closed Issues</h4>
+                    <p class="stat-number display-4 font-weight-bold text-success">{{ closed_issues }}</p>
+                </div>
+                <div class="col-lg-3 col-md-6 stat-box text-center p-4 bg-white rounded shadow-sm mb-4"
+                     style="border-left: 5px solid #858796;">
+                    <h4 class="h6 text-uppercase text-muted">Repositories</h4>
+                    <p class="stat-number display-4 font-weight-bold text-dark">{{ repositories_size }}</p>
+                </div>
+            </section>
+
+            <!-- Section for Repositories -->
+            <section class="repository-table">
+                <h3 class="h5 text-dark font-weight-bold mb-3"><i class="fas fa-code-branch"></i> Repositories</h3>
+                <div class="table-responsive">
+                    <table id="repositoryTable" class="table table-hover bg-white shadow-sm rounded">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th>Repository Name</th>
+                            <th>Owner</th>
+                            <th>Number of Issues</th>
+                            <th>Language</th>
+                            <th>Created At</th>
+                            <th>Last Push</th>
+                            <th>Link</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for repo in repository_list %}
+                            <tr class="table-row-hover">
+                                <td>{{ repo.name }}</td>
+                                <td>{{ repo.owner }}</td>
+                                <td>{{ repo.opened_issues }}</td>
+                                <td>{{ repo.language }}</td>
+                                <td>{{ repo.created_at }}</td>
+                                <td>{{ repo.pushed_at }}</td>
+                                <td><a href="{{ repo.git_link }}" target="_blank" class="btn btn-sm btn-primary">View
+                                    Repo</a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div> <!-- End Main Content -->
+    </div> <!-- End Container -->
+
+    <!-- Script for jQuery, DataTables, FontAwesome -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: #f8f9fc;
+        }
+
+        .stat-box {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .stat-box:hover {
+            transform: scale(1.05);
+        }
+
+        .table-row-hover:hover {
+            background-color: #f1f1f1;
+        }
+
+        .table thead th {
+            background-color: #343a40;
+            color: white;
+        }
+
+        .table thead th, .table td {
+            vertical-align: middle;
+        }
+
+        .btn-primary {
+            background-color: #4e73df;
+            border-color: #4e73df;
+        }
+
+        .btn-primary:hover {
+            background-color: #2e59d9;
+        }
+
+        .card {
+            transition: box-shadow 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge-info {
+            background-color: #36b9cc;
+        }
+    </style>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends 'sidebar.html' %}
+{% block content %}
+    <div class="container-fluid d-flex justify-content-center align-items-center"
+         id="dynamic-bg"
+         style="height: 100vh; background: linear-gradient(135deg, #4e73df 0%, #1cc88a 100%); animation: gradientAnimation 2s ease-in-out infinite;">
+        <div class="card p-5 shadow-lg rounded"
+             style="width: 400px; background: rgba(255, 255, 255, 0.9); border-radius: 1rem; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);">
+            <h3 class="text-center mb-4" style="color: #4e73df; font-weight: 700; font-size: 1.75rem;">
+                <i class="fas fa-sign-in-alt"></i> Login to GitHub Dashboard
+            </h3>
+
+            <!-- Error Messages -->
+            {% if messages %}
+                <div class="alert alert-danger" style="border-radius: 0.75rem;">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+                <div class="form-group mb-4">
+                    <label for="github_username" class="font-weight-bold">GitHub Username</label>
+                    <input type="text" name="github_username" id="github_username"
+                           class="form-control form-control-lg"
+                           value="{{ github_username }}"
+                           placeholder="Enter GitHub Username"
+                           required>
+                </div>
+                <div class="form-group mb-4">
+                    <label for="github_email" class="font-weight-bold">GitHub Email</label>
+                    <input type="email" name="github_email" id="github_email"
+                           class="form-control form-control-lg"
+                           value="{{ github_email }}"
+                           placeholder="Enter GitHub Email"
+                           required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                    Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        /* Button hover and animation */
+        .btn:hover {
+            background-color: #375a7f;
+            transform: translateY(-3px);
+        }
+
+        /* Form control focus */
+        .form-control:focus {
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+            border-color: #1cc88a;
+        }
+
+        /* General form labels */
+        .form-group label {
+            font-weight: bold;
+            color: #4e73df;
+        }
+
+        /* Card styling */
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Animated gradient background */
+        #dynamic-bg {
+            background: linear-gradient(135deg, #4e73df 0%, #1cc88a 100%);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease-in-out infinite;
+        }
+
+        /* Gradient animation keyframes */
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0 50%;
+            }
+        }
+
+        /* Enhanced form-control with hover effect */
+        .form-control {
+            padding: 0.85rem;
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+{% endblock %}

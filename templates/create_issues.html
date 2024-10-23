@@ -1,0 +1,148 @@
+{% extends 'sidebar.html' %}
+
+{% block content %}
+    {% if not request.session.github_username %}
+        <script>
+            window.location.href = "{% url 'login' %}";
+        </script>
+    {% endif %}
+
+    <div class="container-fluid d-flex p-0">
+        <!-- Main Dashboard Area -->
+        <div class="main-content flex-grow-1 p-5" style="background-color: #f4f7fc;">
+            <!-- Header -->
+            <header class="header d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h3 text-dark font-weight-bold">Issue Tracker Dashboard</h2>
+                <span class="text-muted">Logged in as: <strong>{{ request.session.github_username }}</strong></span>
+            </header>
+
+            <!-- Form for Creating a New Issue -->
+            <section class="create-issue-form mb-5">
+                <div class="card bg-white shadow-sm rounded">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="h5 mb-0">Create a New Issue</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'create_issues' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="issueTitle">Issue Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="issueTitle" name="title" placeholder="Enter issue title" required>
+                                <div class="invalid-feedback">Please enter a title for the issue.</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="issueRepo">Repository <span class="text-danger">*</span></label>
+                                <select class="form-control" id="issueRepo" name="repository" required>
+                                    <option value="" disabled selected>Select repository</option>
+                                    {% for repo in repository_list %}
+                                        <option value="{{ repo.name }}">{{ repo.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Please select a repository.</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="issueDescription">Issue Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="issueDescription" name="description" rows="4" placeholder="Describe the issue" required></textarea>
+                                <div class="invalid-feedback">Please provide a description of the issue.</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="issueLabels">Labels</label>
+                                <input type="text" class="form-control" id="issueLabels" name="labels" placeholder="Comma-separated labels (e.g. bug, enhancement)">
+                            </div>
+                            <button type="submit" class="btn btn-success btn-block">Create Issue</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        
+        </div> <!-- End Main Content -->
+    </div> <!-- End Container -->
+
+    <!-- Script for jQuery, DataTables, FontAwesome -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+    <script>
+        // Simple form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: #f8f9fc;
+        }
+
+        .stat-box {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .stat-box:hover {
+            transform: scale(1.05);
+        }
+
+        .table-row-hover:hover {
+            background-color: #f1f1f1;
+        }
+
+        .table thead th {
+            background-color: #343a40;
+            color: white;
+        }
+
+        .table thead th, .table td {
+            vertical-align: middle;
+        }
+
+        .btn-primary {
+            background-color: #4e73df;
+            border-color: #4e73df;
+        }
+
+        .btn-primary:hover {
+            background-color: #2e59d9;
+        }
+
+        .card {
+            transition: box-shadow 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge-info {
+            background-color: #36b9cc;
+        }
+
+        .create-issue-form .card-header {
+            background: linear-gradient(135deg, #4e73df 0%, #1cc88a 100%);
+        }
+
+        .btn-success {
+            background-color: #1cc88a;
+            border-color: #1cc88a;
+        }
+
+        .btn-success:hover {
+            background-color: #17a673;
+        }
+    </style>
+{% endblock %}

@@ -1,0 +1,118 @@
+/* General Styles */
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #f0f2f5 0%, #e4ebf5 100%);
+    perspective: 1000px;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    background-color: #2c2f35;
+    color: white;
+    width: 250px;
+    padding: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    transform: rotateY(10deg);
+    transition: background-color 0.3s ease;
+}
+
+.sidebar.disabled {
+    background-color: #6c757d; /* Gri */
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.sidebar h1 {
+    font-size: 24px;
+    margin-bottom: 40px;
+}
+
+.sidebar .nav {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar .nav li {
+    margin: 20px 0;
+}
+
+.sidebar .nav a {
+    color: #61dafb;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.sidebar .nav a.disabled {
+    color: #b8b8b8; /* Gri */
+}
+
+.sidebar .nav a.active {
+    color: white;
+    border-left: 4px solid #61dafb;
+    padding-left: 10px;
+}
+
+.sidebar .nav a:hover {
+    color: #fff;
+}
+
+/* Login Form */
+.login-form {
+    background-color: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+}
+
+.login-form h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.login-form p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.login-form input {
+    padding: 10px;
+    margin: 10px 0;
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+.login-btn {
+    padding: 10px 20px;
+    background: linear-gradient(45deg, #61dafb, #007bff);
+    border: none;
+    border-radius: 30px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+}

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}GitHub Issues Dashboard{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" type='text/css' href="{% static 'style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7; 
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+
+        .content-wrapper {
+            display: flex;
+            flex: 1;
+        }
+
+
+        .sidebar {
+            background-color: #f0f0f0; 
+            width: 250px;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar .logo {
+            font-size: 1.5rem;
+            color: #333; 
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .sidebar .nav-link {
+            color: #333;
+            font-weight: 600;
+            margin: 10px 0;
+            padding: 10px 15px;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: #d3d3d3;
+            color: #333;
+            border-radius: 8px;
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #4CAF50; 
+            color: white;
+            border-radius: 10px;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+
+        /* Buton de logout */
+        .btn-logout {
+            background-color: #e74c3c; 
+            color: white;
+        }
+
+        .btn-logout:hover {
+            background-color: #c0392b;
+        }
+
+        /* Main content area */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 4px; 
+            font-size: 0.8rem; 
+        }
+
+ 
+        .btn-primary {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .btn-primary:hover {
+            background-color: #45a049;
+            border-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="wrapper">
+
+    <div class="content-wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar d-flex flex-column justify-content-between p-3 shadow-lg">
+            <div>
+                <h1 class="logo">GitHub Issues</h1>
+                <ul class="nav flex-column">
+                    {% if request.session.github_username %}
+                        <li class="nav-item">
+                            <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                                <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'open_issues' %}" class="nav-link {% if request.resolver_match.url_name == 'open_issues' %}active{% endif %}">
+                                <i class="fas fa-exclamation-circle"></i> <span>Open Issues</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'close_issues' %}" class="nav-link {% if request.resolver_match.url_name == 'close_issues' %}active{% endif %}">
+                                <i class="fas fa-check-circle"></i> <span>Closed Issues</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'create_issues' %}" class="nav-link {% if request.resolver_match.url_name == 'create_issues' %}active{% endif %}">
+                                <i class="fas fa-plus-circle"></i> <span>Create Issue</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <span class="text-muted">Login to access the dashboard</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            {% if request.session.github_username %}
+                <div class="mt-auto">
+                    {% csrf_token %}
+                    <button id="logoutBtn" class="btn btn-logout btn-block font-weight-bold">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="container-fluid main-content">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 GitHub Issues Dashboard. All Rights Reserved.</p>
+    </footer>
+</div>
+
+<!-- Full version of jQuery (ensure DataTables works) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- FontAwesome for icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function () {
+            if (confirm('Are you sure you want to logout?')) {
+                var logoutForm = document.createElement('form');
+                logoutForm.method = 'POST';
+                logoutForm.action = "{% url 'logout' %}";
+
+                var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                var csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = csrfToken;
+                logoutForm.appendChild(csrfInput);
+
+                document.body.appendChild(logoutForm);
+                logoutForm.submit();
+            }
+        });
+    }
+});
+
+</script>
+
+</body>
+</html>
